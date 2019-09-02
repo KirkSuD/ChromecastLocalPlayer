@@ -13,39 +13,6 @@ PORT = 8080 # random.randint(3001, 9999) #
 """
 Chromecast controller with Bottle Server UI
 Requirements: bottle, pychromecast
-
-/ccast/hello
-/ccast/hello/<name>
-Simple test
-
-/
-Redirect to /ccast
-
-/ccast
-Return a UI HTML
-<friendly name>
-<volume_mute_toggle_button> <volume_down_button> <volume_slider> <volume_up_button>
-<rewind_button> <stop_button> <play/pause_button>
-<-10sec_button> <time_slider> <+10sec_button>
-
-/ccast/status
-Return Chromecast status JSON with these keys:
-friendly_name, volume_level, volume_muted, status_text, title, current_time, duration, player_state
-
-/ccast/volume_mute_toggle
-/ccast/volume_mute_true
-/ccast/volume_mute_false
-
-/ccast/volume_up
-/ccast/volume_down
-/ccast/volume_set/<volume>
-
-/ccast/play_media?url=<>&content_type=<>&title=<>&thumb=<>&current_time=<>
-/ccast/play
-/ccast/rewind
-/ccast/pause
-/ccast/stop
-/ccast/seek/<time>
 """
 
 if __name__ == "__main__":
