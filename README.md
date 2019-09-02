@@ -63,7 +63,6 @@ The icons' filenames used in `ChromeCastControl.html` are:
 
 ## Some screenshots
 
-![Screenshot - the HTTP server](https://raw.githubusercontent.com/KirkSuD/ChromecastLocalPlayer/master/screenshot/screenshot0.png)
 ![Screenshot - the Chromecast controller without icons](https://raw.githubusercontent.com/KirkSuD/ChromecastLocalPlayer/master/screenshot/screenshot1.png)
 If you use icons, it'll be much prettier(I don't own the icons, this is just an example):
 ![Screenshot - the Chromecast controller with icons](https://raw.githubusercontent.com/KirkSuD/ChromecastLocalPlayer/master/screenshot/screenshot2.png)
