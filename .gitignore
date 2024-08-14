@@ -1,2 +1,7 @@
-/__pycache__/
-/tempCodeRunnerFile.py
+*
+!.gitignore
+!README.md
+!requirements.txt
+!*.py
+!*.html
+!*.tpl

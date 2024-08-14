@@ -1,13 +1,15 @@
 # Chromecast Local Player
 
 A simple Python server with web UI to control Chromecast,
- play local media files via Chromecast.
+    play local media files via Chromecast.
+
+(Note: this is legacy code, which probably requires an older `pychromecast`.  
+Back then `pychromecast` only needs py 3.4+, now it needs py 3.11+.  
+A new version is under construction, and will be pushed if finished.)
 
 ## Requirements
 
-* Python 3.4+, because this project uses the [pychromecast](https://github.com/balloob/pychromecast) library. (I think that is okay since Python2.7 will be dead after January 1, 2020)
-* pychromecast installed (just run `pip install pychromecast`)
-* bottle installed (just run `pip install bottle`)
+* bottle & pychromecast (`pip install -r requirements.txt`)
 * (Optional) Search and download some icons, see below.
 
 ## How to use
@@ -60,12 +62,6 @@ The icons' filenames used in `ChromeCastControl.html` are:
     stop.png
     volOFF.png
     volON.png
-
-## Some screenshots
-
-![Screenshot - the Chromecast controller without icons](https://raw.githubusercontent.com/KirkSuD/ChromecastLocalPlayer/master/screenshot/screenshot1.png)
-If you use icons, it'll be much prettier(I don't own the icons, this is just an example):
-![Screenshot - the Chromecast controller with icons](https://raw.githubusercontent.com/KirkSuD/ChromecastLocalPlayer/master/screenshot/screenshot2.png)
 
 ## TODO
 
