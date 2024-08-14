@@ -126,7 +126,7 @@ def drive_app(drive_path):
     elif os.path.isfile(full_path):
         print("Is a file.")
         file_size = os.path.getsize(full_path)
-        if file_size < MAX_PARTIAL_SIZE:
+        if not isvid(full_path) or file_size < MAX_PARTIAL_SIZE:
             path_root, path_name = os.path.split(full_path)
             return bottle.static_file(path_name, root = path_root)
         if "Range" in bottle.request.headers:
@@ -213,7 +213,21 @@ if __name__ == "__main__":
             if webbrowser.open(open_url):
                 print("Opened.")
             else:
-                print("Guess something went wrong, maybe not opened.")
+                print("Trying Redirect.html + termux-share")
+                with open("./Redirect.html", "w") as wf:
+                    html="""<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="refresh" content="0; url=%s" />
+</head>
+<body>
+</body>
+</html>
+""" % open_url
+                    wf.write(html)
+                import subprocess
+                if subprocess.call(["termux-share","./Redirect.html"]):
+                    print("Opened.")
         else:
             print("Trying sl4a...")
             import time
