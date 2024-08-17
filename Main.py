@@ -27,59 +27,6 @@ if __name__ == "__main__":
     else:
         open_url = server_url
 
-    if input("Press Enter to open %s in browser..." % (open_url)) == "":
-        try:
-            from androidhelper import sl4a  # type: ignore
-        except ImportError:
-            print("Trying webbrowser...")
-            import webbrowser
-
-            if webbrowser.open(open_url):
-                print("Opened.")
-            else:
-                print("Trying Redirect.html + termux-share")
-                with open("./Redirect.html", "w") as wf:
-                    html = (
-                        """<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="refresh" content="0; url=%s" />
-</head>
-<body>
-</body>
-</html>
-"""
-                        % open_url
-                    )
-                    wf.write(html)
-                import subprocess
-
-                if subprocess.call(["termux-share", "./Redirect.html"]):
-                    print("Opened.")
-        else:
-            print("Trying sl4a...")
-            import time
-
-            while True:
-                try:
-                    droid = sl4a.Android()
-                    break
-                except Exception:
-                    print("Failed to init sl4a, will try again later.")
-                    time.sleep(0.5)
-            uri2open = open_url
-            intent2start = droid.makeIntent(
-                "android.intent.action.VIEW",
-                uri2open,
-                "text/html",
-                None,
-                ["android.intent.category.BROWSABLE"],
-                None,
-                None,
-                None,
-            )
-            droid.startActivityForResultIntent(intent2start.result)
-            print("Opened.")
     print()
     ccast_control_app.merge(local_server_app)
     bottle.run(ccast_control_app, host=HOST, port=PORT)

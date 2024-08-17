@@ -1,7 +1,3 @@
-# -*-coding:utf-8;-*-
-
-from __future__ import print_function
-
 import json
 import time
 import mimetypes
@@ -14,7 +10,6 @@ from bottle import request as req
 HOST = "0.0.0.0"  # "localhost" #
 PORT = 8080  # random.randint(3001, 9999) #
 DEVICE_FRIENDLY_NAME = "Your device name here"
-VERBOSE_ON = False
 
 """
 Chromecast controller with Bottle Server UI
@@ -113,25 +108,6 @@ def get_status():
 
 
 app = bottle.Bottle()
-
-
-@app.hook("after_request")
-def hide_server():
-    bottle.response.headers["Server"] = (
-        "Super Server v1.2.3"  # hide default bottle header
-    )
-    bottle.response.headers["X-Powered-By"] = "Taiwan NO.1 v9.4.8.7"  # Just 4 fun
-
-    if VERBOSE_ON:
-        print()
-        print("======== after_request verbose info start ========")
-        print("ccast:", ccast)
-        print("ccast.status:", ccast.status)
-        print("medcon:", medcon)
-        print("medcon.status:", medcon.status)
-        print("simplified status:", get_status())
-        print("======== after_request verbose info finish ========")
-        print()
 
 
 @app.get("/ccast/hello")
@@ -296,7 +272,7 @@ def player_seek_rel(time):
 # def not_found(full_path):
 #     print()
 #     print("Not found route.")
-#     bottle.abort(404, "Your brain not found. :)\nWrong URL: '%s'" % full_path)
+#     bottle.abort(404)
 
 if __name__ == "__main__":
     server_url = "http://%s:%s" % (HOST, PORT)
@@ -308,40 +284,5 @@ if __name__ == "__main__":
     else:
         open_url = server_url
 
-    if input("Press Enter to open %s in browser..." % (open_url)) == "":
-        try:
-            from androidhelper import sl4a  # type: ignore
-        except ImportError:
-            print("Trying webbrowser...")
-            import webbrowser
-
-            if webbrowser.open(open_url):
-                print("Opened.")
-            else:
-                print("Guess something went wrong, maybe not opened.")
-        else:
-            print("Trying sl4a...")
-            import time
-
-            while True:
-                try:
-                    droid = sl4a.Android()
-                    break
-                except Exception:
-                    print("Failed to init sl4a, will try again later.")
-                    time.sleep(0.5)
-            uri2open = open_url
-            intent2start = droid.makeIntent(
-                "android.intent.action.VIEW",
-                uri2open,
-                "text/html",
-                None,
-                ["android.intent.category.BROWSABLE"],
-                None,
-                None,
-                None,
-            )
-            droid.startActivityForResultIntent(intent2start.result)
-            print("Opened.")
     print()
     bottle.run(app, host=HOST, port=PORT)

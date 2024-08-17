@@ -29,14 +29,6 @@ def get_internal_ip():
 app = bottle.Bottle()
 
 
-@app.hook("after_request")
-def hide_server():
-    bottle.response.headers["Server"] = (
-        "Super Server v1.2.3"  # hide default bottle header
-    )
-    bottle.response.headers["X-Powered-By"] = "Your parents v9.8.7"  # Just 4 fun
-
-
 @app.get("/hello")
 @app.get("/hello/<name>")
 def hello_name(name="World"):
@@ -188,25 +180,11 @@ def home_page():
     bottle.redirect(home_path)  # return "Home page."
 
 
-# @app.route("/404")
-# def return_404():
-#     print()
-#     print("404 for fun.")
-#     bottle.response.status = "404 Your brain not found!"
-#     return "<h1>404 Your brain not found!</h1><h1>Did you miss it somewhere?</h1>"
-
-# @app.route("/418")
-# def return_418():
-#     print()
-#     print("418 I'm a teapot for fun.")
-#     bottle.abort(418, "I'm a teapot!\nDon't attempt to brew coffee with me!")
-
-
 @app.route("<full_path:path>")
 def not_found(full_path):
     print()
     print("Not found route.")
-    bottle.abort(404, "Your brain not found. :)\nWrong URL: '%s'" % full_path)
+    bottle.abort(404)
 
 
 if __name__ == "__main__":
@@ -221,58 +199,5 @@ if __name__ == "__main__":
     else:
         open_url = server_url
 
-    if input("Press Enter to open %s in browser..." % (open_url)) == "":
-        try:
-            from androidhelper import sl4a  # type: ignore
-        except ImportError:
-            print("Trying webbrowser...")
-            import webbrowser
-
-            if webbrowser.open(open_url):
-                print("Opened.")
-            else:
-                print("Trying Redirect.html + termux-share")
-                with open("./Redirect.html", "w") as wf:
-                    html = (
-                        """<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="refresh" content="0; url=%s" />
-</head>
-<body>
-</body>
-</html>
-"""
-                        % open_url
-                    )
-                    wf.write(html)
-                import subprocess
-
-                if subprocess.call(["termux-share", "./Redirect.html"]):
-                    print("Opened.")
-        else:
-            print("Trying sl4a...")
-            import time
-
-            while True:
-                try:
-                    droid = sl4a.Android()
-                    break
-                except Exception:
-                    print("Failed to init sl4a, will try again later.")
-                    time.sleep(0.5)
-            uri2open = open_url
-            intent2start = droid.makeIntent(
-                "android.intent.action.VIEW",
-                uri2open,
-                "text/html",
-                None,
-                ["android.intent.category.BROWSABLE"],
-                None,
-                None,
-                None,
-            )
-            droid.startActivityForResultIntent(intent2start.result)
-            print("Opened.")
     print()
     bottle.run(app, host=HOST, port=PORT)
