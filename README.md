@@ -57,6 +57,20 @@ Internal IP URL: http://192.168.XXX.XXX:8080
 I wrote `Dockerfile`.  
 I guess it would work, but it's never tested.
 
+## Screenshots
+
+- Main UI
+
+<img src="https://i.imgur.com/i2s2MMK.png" alt="Chromecast control main UI">
+
+- Cast UI
+
+<img src="https://i.imgur.com/Je8KPeZ.png" alt="Chromecast control cast UI" width="400">
+
+- File Explorer
+
+<img src="https://i.imgur.com/NlIuQQh.png" alt="File explorer UI" width="400">
+
 ## How it works
 
 `streaming_server.py` and `file_explorer.tpl` form a simple HTTP server  
@@ -71,6 +85,7 @@ You can run it on your computer, and access files on another device within same 
 - better front-end
     - icons?
     - avoid changing input values when user interacting
+    - remember status & check some preconditions?
     - better theme?
     - better layout?
 - more testing
