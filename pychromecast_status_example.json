@@ -1,0 +1,70 @@
+{
+    "info": {
+        "services": [
+            {
+                "name": "Chromecast-<32hex>._googlecast._tcp.local."
+            }
+        ],
+        "uuid": "<UUID>",
+        "model_name": "Chromecast",
+        "friendly_name": "TV",
+        "host": "192.168.XXX.XXX",
+        "port": 8009,
+        "cast_type": "cast",
+        "manufacturer": "Google Inc."
+    },
+    "cast": {
+        "is_active_input": false,
+        "is_stand_by": true,
+        "volume_level": 1.0,
+        "volume_muted": false,
+        "app_id": "E8C28D3C",
+        "display_name": "Backdrop",
+        "namespaces": [
+            "urn:x-cast:com.google.cast.debugoverlay",
+            "urn:x-cast:com.google.cast.cac",
+            "urn:x-cast:com.google.cast.sse",
+            "urn:x-cast:com.google.cast.remotecontrol"
+        ],
+        "session_id": "<UUID>",
+        "transport_id": "<UUID>",
+        "status_text": "",
+        "icon_url": "",
+        "volume_control_type": "attenuation"
+    },
+    "media": {
+        "metadata_type": null,
+        "title": null,
+        "series_title": null,
+        "season": null,
+        "episode": null,
+        "artist": null,
+        "album_name": null,
+        "album_artist": null,
+        "track": null,
+        "subtitle_tracks": {},
+        "images": [],
+        "supports_pause": false,
+        "supports_seek": false,
+        "supports_stream_volume": false,
+        "supports_stream_mute": false,
+        "supports_skip_forward": false,
+        "supports_skip_backward": false,
+        "current_time": 0.0,
+        "content_id": null,
+        "content_type": null,
+        "duration": null,
+        "stream_type": "UNKNOWN",
+        "idle_reason": null,
+        "media_session_id": null,
+        "playback_rate": 1.0,
+        "player_state": "UNKNOWN",
+        "supported_media_commands": 0,
+        "volume_level": 1.0,
+        "volume_muted": false,
+        "media_custom_data": {},
+        "media_metadata": {},
+        "current_subtitle_tracks": [],
+        "last_updated": null
+    }
+}

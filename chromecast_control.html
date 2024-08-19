@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Chromecast Control</title>
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, user-scalable=no">
+    <style>
+html {
+    height: 100%;
+}
+body {
+    margin: 0;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    font-family: sans-serif;
+}
+#control {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+#play {
+    display: none;
+    flex-direction: column;
+    align-self: center;
+    height: 100%;
+}
+#play > * {
+    margin: 2vh 3vw;
+}
+#play > div {
+    display: flex;
+}
+#play > div > button {
+    flex: 1;
+    height: 10vh;
+    margin: 1%;
+}
+#play input[type="text"], #play input[type="number"] {
+    float: right;
+}
+#controlStatus {
+    padding: 3vh 3vw;
+}
+#controlStatus > * {
+    margin: 3vh 3vw;
+    margin-bottom: 0;
+}
+#castStatus::before {
+    content: "Cast status: ";
+}
+#playerState::before {
+    content: "Player state: ";
+}
+#controlMain {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#controlMain > button {
+    width: 25%;
+    height: 70%;
+    margin: 0 2%;
+    font-size: large;
+}
+#controlOthers {
+    display: flex;
+    margin: 1vh 3vw;
+}
+#controlLeft, #controlRight {
+    display: flex;
+    flex-direction: column;
+}
+#controlLeft {
+    width: 60%;
+}
+#controlRight {
+    width: 40%;
+}
+#controlLeft > div, #controlRight > div {
+    display: flex;
+    height: 8vh;
+    margin: 1vh 1vw;
+}
+#controlLeft > div > *, #controlRight > div > * {
+    margin: 1vh 1vw;
+}
+#controlLeft > div > button, #controlLeft > div > input {
+    flex: 1;
+}
+#controlLeft > div > p, #controlRight > div > p {
+    align-self: center;
+}
+#controlRight > div > input {
+    width: 40%;
+}
+#controlRight > div > button {
+    width: 20%;
+}
+@media (max-width: 768px) {
+    #controlOthers {
+        flex-direction: column;
+    }
+    #controlLeft, #controlRight {
+        width: unset;
+    }
+    #controlLeft {
+        order: 2;
+    }
+    #controlRight {
+        order: 1;
+    }
+}
+@media (prefers-color-scheme: dark) {
+    body, #control input, #control button, #play input, #play button {
+        background-color: rgb(30, 30, 30);
+        color: rgb(200, 200, 200);
+    }
+}
+
+    </style>
+</head>
+
+<body>
+    <div id="control">
+        <div id="controlStatus">
+            <label>
+                Chromecast:
+                <select id="castSelect" data-function="connect" data-param="name">
+                </select>
+            </label>
+            <h4 id="castStatus">Searching</h4>
+            <h4 id="playerState"></h4>
+        </div>
+
+        <div id="controlMain">
+            <button id="seekMinusButton"
+                data-function="seek_relative" data-param="delta" data-arg="-10">
+                Seek-</button>
+            <button id="playButton" data-function="play_toggle">Play</button>
+            <button id="seekPlusButton"
+                data-function="seek_relative" data-param="delta" data-arg="10">
+                Seek+</button>
+        </div>
+
+        <div id="controlOthers">
+            <div id="controlLeft">
+                <div>
+                    <button id="prevButton" data-function="queue_prev">Prev</button>
+                    <button id="rewindButton" data-function="rewind">Rewind</button>
+                    <button id="stopButton" data-function="stop">Stop</button>
+                    <button id="skipButton" data-function="skip">Skip</button>
+                    <button id="nextButton" data-function="queue_next">Next</button>
+                </div>
+
+                <div>
+                    <p id="currentTime">0</p>
+                    <input id="progressBar" type="range" min="0" step="1" value="0"
+                        data-function="seek" data-param="position">
+                    <p id="duration">0</p>
+                </div>
+            </div>
+
+            <div id="controlRight">
+                <div>
+                    <input id="rateInput" type="number"
+                        min="0.5" max="2" step="0.1" placeholder="Playback rate"
+                        data-function="set_playback_rate" data-param="playback_rate"
+                        data-empty="reset_playback_rate">
+                    <input id="subtitleInput" type="number" step="1" placeholder="Subtitle ID"
+                        data-function="enable_subtitle" data-param="track_id"
+                        data-empty="disable_subtitle">
+                    <button id="castButton">Cast</button>
+                </div>
+
+                <div>
+                    <button id="muteButton"
+                        data-function="set_volume_muted" data-param="muted" data-bool="false">
+                        Mute</button>
+                    <button id="volumeMinusButton"
+                        data-function="volume_down" data-param="delta" data-arg="0.1">
+                        Vol-</button>
+                    <input id="volumeBar" type="range" min="0" max="1" step="0.01" value="1"
+                        data-function="set_volume" data-param="volume">
+                    <p id="currentVolume">100</p>
+                    <button id="volumePlusButton"
+                        data-function="volume_up" data-param="delta" data-arg="0.1">
+                        Vol+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="play">
+        <div>
+            <button id="playPlayButton">Play</button>
+            <button id="playFileButton">File</button>
+            <button id="playCancelButton">Cancel</button>
+        </div>
+        <label><input name="autoplay" type="checkbox" checked> Auto play</label>
+        <label><input name="enqueue" type="checkbox"> Enqueue instead of play</label>
+        <label>Media URL: <input name="url" type="text"></label>
+        <label>MIME type: <input name="content_type" type="text"></label>
+        <label>Title: <input name="title" type="text"></label>
+        <label>Thumbnail URL: <input name="thumb" type="text"></label>
+        <label>Start seconds: <input name="current_time" type="number" min="0"></label>
+        <label>Stream type: <input name="stream_type" type="text"></label>
+        <label>Subtitles URL: <input name="subtitles" type="text"></label>
+        <label>Subtitles language: <input name="subtitles_lang" type="text"></label>
+        <label>Subtitles MIME type: <input name="subtitles_mime" type="text"></label>
+        <label>Subtitles ID: <input name="subtitles_id" type="number" step="1"></label>
+        <label>Metadata (JSON): <textarea name="metadata"></textarea></label>
+        <label>Media info (JSON): <textarea name="media_info"></textarea></label>
+    </div>
+
+    <script>
+function $(selectors, element=document) {
+    return element.querySelector(selectors);
+}
+
+function $$(selectors, element=document) {
+    return Array.from(element.querySelectorAll(selectors));
+}
+
+async function requestCast(functionName, args={}, alertError=true) {
+    function handleError(errorMessage) {
+        if (alertError) {
+            alert(errorMessage);
+        }
+        throw new Error(errorMessage);
+    }
+    const origin = new URL(location.href).origin;
+    const url = new URL(origin + "/cast/" + functionName);
+    for (const key in args) {
+        url.searchParams.set(key, args[key]);
+    }
+    console.log("requestCast start:", functionName, args, url);
+    let resp;
+    try {
+        resp = await fetch(url, {
+            method: "GET",
+            headers: {"Accept": "application/json"},
+        });
+    } catch (e) {
+        console.log("requestCast fetch error:", functionName, args, url, e);
+        handleError(`Error! ${functionName}: ${e}`);
+    }
+    if (!resp.ok) {
+        console.log("requestCast response not ok:", functionName, args, url, resp);
+        handleError(`Error! ${functionName}: ${resp.status} ${resp.statusText}`);
+    }
+    const res = await resp.json();
+    if ("error" in res) {
+        console.log("requestCast returns error:", functionName, args, url, resp, res);
+        handleError(`Error! ${functionName}: ${res.error}`);
+    }
+    console.log("requestCast okay:", functionName, args, res);
+    return res;
+}
+
+$("#castButton").addEventListener("click", event => {
+    if ($("#castSelect").value === "") {
+        alert("Please select (connect to) a chromecast first.");
+        return;
+    }
+    $("#control").style.display = "none";
+    $("#play").style.display = "flex";
+});
+
+$("#playCancelButton").addEventListener("click", event => {
+    $("#control").style.display = "flex";
+    $("#play").style.display = "none";
+    const url = new URL(location.href);
+    if (url.searchParams.has("cast") || url.searchParams.has("url")) {
+        url.searchParams.delete("cast");
+        url.searchParams.delete("url");
+        window.history.pushState(null, "", url);
+    }
+});
+
+$("#playFileButton").addEventListener("click", event => {
+    const origin = new URL(location.href).origin;
+    const castUrl = new URL(origin + "/cast");
+    castUrl.searchParams.set("cast", $("#castSelect").value);
+    castUrl.searchParams.set("url", origin);
+
+    const explorerUrl = new URL(origin + "/explorer");
+    explorerUrl.searchParams.set("filter_type", "video,audio,image");
+    explorerUrl.searchParams.set("file_url", castUrl);
+    location.href = explorerUrl;
+});
+
+$("#playPlayButton").addEventListener("click", event => {
+    const inputs = $$("#play input").concat($$("#play textarea"));
+    const args = {};
+    for (const input of inputs) {
+        const name = input.getAttribute("name");
+        let value;
+        if (input.getAttribute("type") === "checkbox") {
+            value = input.checked;
+        }
+        else {
+            value = input.value;
+            if (value.length === 0) {
+                continue;
+            }
+        }
+        args[name] = value;
+    }
+    requestCast("play_media", args);
+    $("#playCancelButton").click();
+});
+
+(function() {
+    const url = new URL(location.href);
+    if (url.searchParams.has("cast")) {
+        const cast = url.searchParams.get("cast");
+        $("#castSelect").insertAdjacentHTML("beforeend", `
+            <option value="${cast}">${cast}</option>`);
+        $("#castSelect").value = cast;
+    }
+    if (url.searchParams.has("url")) {
+        $('#play input[name="url"]').value = url.searchParams.get("url");
+        if ($("#castSelect").value !== "") {
+            $("#castButton").click();
+        }
+    }
+})();
+
+(async function() {
+    const url = new URL(location.href);
+    if (url.searchParams.has("cast")) {
+        return;
+    }
+    const res = await requestCast("search");
+    for (const name of res.names) {
+        $("#castSelect").insertAdjacentHTML("beforeend", `
+            <option value="${name}">${name}</option>
+        `);
+    }
+    $("#castSelect").selectedIndex = -1;
+    $("#castStatus").innerText = "Not connected";
+})();
+
+(function() {
+    const elements = $$("select").concat($$("input")).concat($$("button"));
+    for (const element of elements) {
+        const eventType = (element.nodeName === "BUTTON") ? "click" : "change";
+        if (!("function" in element.dataset)) {
+            continue;
+        }
+        element.addEventListener(eventType, event => {
+            const element = event.currentTarget;
+            const functionName = element.dataset.function;
+            // function param arg empty bool
+            // select input[number,range] button
+            if (!("param" in element.dataset)) {
+                requestCast(functionName);
+                return;
+            }
+            const param = element.dataset.param;
+            if ("arg" in element.dataset) {
+                const arg = element.dataset.arg;
+                requestCast(functionName, {[param]: arg});
+                return;
+            }
+            if ("bool" in element.dataset) {
+                const arg = (element.dataset.bool === "true") ? "false" : "true";
+                requestCast(functionName, {[param]: arg});
+                return;
+            }
+            const arg = element.value;
+            if ("empty" in element.dataset && arg.length === 0) {
+                requestCast(element.dataset.empty);
+                return;
+            }
+            requestCast(functionName, {[param]: arg});
+        });
+    }
+})();
+
+window.addEventListener("keydown", event => {
+    const hotKeys = {
+        "ArrowLeft": "#seekMinusButton",
+        " ": "#playButton",
+        "ArrowRight": "#seekPlusButton",
+        "p": "#prevButton",
+        "s": "#stopButton",
+        "n": "#nextButton",
+        "m": "#muteButton",
+        "ArrowDown": "#volumeMinusButton",
+        "ArrowUp": "#volumePlusButton",
+    };
+    if (event.key in hotKeys) {
+        $(hotKeys[event.key]).click();
+    }
+});
+
+setInterval(async function() {
+    function formatTime(sec){
+        sec = Math.round(sec);
+        if (sec == 0){
+            return "0";
+        }
+        let res = "";
+        const minus = (sec < 0);
+        sec = Math.abs(sec);
+        while (sec > 0){
+            const n = sec % 60;
+            if (n > 9) {
+                res = n + ":" + res;
+            }
+            else{
+                res = "0" + n + ":" + res;
+            }
+            sec = Math.floor(sec / 60);
+        }
+        return (minus ? "-" : "") + res.slice(0,-1);
+    }
+
+    if ($("#castSelect").value === "") {
+        return;
+    }
+    let res;
+    try {
+        res = await requestCast("status", {}, alertError=false);
+    }
+    catch (e) {
+        $("#castStatus").innerText = "Error or Connecting";
+        throw e;
+    }
+    const cast = res.cast;
+    const media = res.media;
+
+    $("#castSelect").value = res.info.friendly_name;
+    $("#castStatus").innerText = cast.status_text;
+    $("#playerState").innerText = media.player_state;
+    $("#playButton").innerText = {
+        PLAYING: "Pause", PAUSED: "Play"}[media.player_state] || "";
+
+    $("#currentTime").innerText = formatTime(media.current_time);
+    $("#progressBar").setAttribute("max", media.duration);
+    $("#progressBar").value = media.current_time;
+    $("#duration").innerText = formatTime(media.duration);
+    $("#rateInput").value = media.playback_rate;
+    $("#muteButton").dataset.bool = cast.volume_muted;
+    $("#muteButton").innerText = cast.volume_muted ? "Muted" : "Mute";
+    $("#volumeBar").value = cast.volume_level;
+    $("#currentVolume").innerText = Math.round(cast.volume_level * 100);
+}, 500);
+
+    </script>
+</body>
+
+</html>

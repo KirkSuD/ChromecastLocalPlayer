@@ -3,67 +3,74 @@
 A simple Python server with web UI to control Chromecast,
     play local media files via Chromecast.
 
-(Note: this is legacy code, which probably requires an older `pychromecast`.  
-Back then `pychromecast` only needs py 3.4+, now it needs py 3.11+.  
-A new version is under construction, and will be pushed if finished.)
-
 ## Requirements
 
-* bottle & pychromecast (`pip install -r requirements.txt`)
-* (Optional) Search and download some icons, see below.
+`pip install -r requirements.txt`:
+- `bottle`: fast and simple micro-framework for python
+- `pychromecast`: version 14.0.1 needs **Python 3.11+**
+- `requests`: used to get media content-type from url
+- `waitress`: default server, optional, you can use another server
 
 ## How to use
 
-First, some one-time configuration is needed:
+1. Run `chromecast_control.py`:
+```
+usage: chromecast_control.py [-h]
+    [--server SERVER] [--host HOST] [--port PORT] [--open]
+    [--under UNDER] [--home HOME] [--static STATIC] [--partial PARTIAL] [--disable]
 
-1. Configure the `home_path` variable in `BottlePartialContent.py` as it is used to redirect from the root of the server. (Or you'll have to type the path you want manually each time you run this)
-2. Configure the `DEVICE_FRIENDLY_NAME` variable in `ChromeCastControl.py`. Just type your Chromecast's name. (It depends on your Chromecast's settings. It may be something like "living room" or "客廳".) This is used to search your Chromecast.
-3. Configure the `PORT` variable in `Main.py`. (Or just use the default 8080) This is the port you'll connect.
+An HTTP server to control Chromecast & cast local media
 
-Then, everytime you run you just:
+options:
+  -h, --help         show this help message and exit
+  --server SERVER    server to use (default: waitress)
+  --host HOST        address to bind to (default: 0.0.0.0)
+  --port PORT        port to bind to (default: 8080)
+  --open             open browser (default: no)
+  --under UNDER      limit access under path (default: no limit)
+  --home HOME        home path (default: user's home dir)
+  --static STATIC    max static file size (default: 16MiB)
+  --partial PARTIAL  default range length (default: 4MiB)
+  --disable          disable streaming server (default: no)
+```
 
-1. Make sure your computer and Chromecast are in the same network. (Same Wi-fi, basically.)
-2. Run `Main.py`. It'll search your Chromecast, then press enter to open the browser.
-3. Enjoy the powerful Chromecast controller and player.
+2. It would print something like this, visit the "internal IP URL":
+```
+Listen on: http://0.0.0.0:8080
+Local URL: http://localhost:8080
+Internal IP URL: http://192.168.XXX.XXX:8080
+```
+
+3. Wait until the search is done, then select a chromecast to connect to.
+4. Click the "Cast" button.
+5. Paste media URL to cast; or click the "File" button to browse local files.
+6. In the file explorer, you can navigate and filter. Click a file to cast.
+
+## Hot keys
+
+- Left / Space / Right: seek -10s / pause,play / seek +10s
+- P / S / N: previous / stop / next
+- M / Down / Up: mute / volume down / volume up
+
+## Docker
+
+I wrote `Dockerfile`.  
+I guess it would work, but it's never tested.
 
 ## How it works
 
-`BottlePartialContent.py` and `BottlePartialContentDirView.tpl` form a simple HTTP server which
- supports streaming(partial content, the `206` HTTP status code).  
-You can run it on your computer, and watch the video in it on your cellphone!
+`streaming_server.py` and `file_explorer.tpl` form a simple HTTP server  
+    which supports streaming (HTTP range requests, 206 Partial Content).  
+You can run it on your computer, and access files on another device within same LAN.
 
-`ChromeCastControl.py` and `ChromeCastControl.html` form a Chromecast controller,
- a simple web interface to control Chromecast.
+`chromecast_control.py` and `chromecast_control.html` form a Chromecast controller.  
+`chromecast_control.html` gets chromecast status every 500ms, and updates the UI.
 
-`Main.py` combines these two independent scripts, forms an app which lets you
- play the videos in your computer. The former hosts the file, and the latter tells Chromecast where
- to play the video.
+## To do
 
-## Questions that may be asked
-
-**On which platforms can I run this?**
-
-Basically every platforms with Python 3.4+.  
-Though I only tested on Windows, Android Qpython3 and Termux.  
-There are browser opening features for PC / sl4a / Termux in `Main.py`.
-
-**Why the `icon` folder is empty?**
-
-I don't own any icons. I'm afraid that there would be copyright issues if I upload them.  
-The icons' filenames used in `ChromeCastControl.html` are:
-
-    10sec_backward-512.png
-    10sec_forward-512.png
-    minus.png
-    pause.png
-    play.png
-    plus.png
-    rewind.png
-    stop.png
-    volOFF.png
-    volON.png
-
-## TODO
-
-* The code is messy; clean it!
-* It prints some exceptions; fix it! (But I haven't encountered any bugs / unexpected exiting. The program runs smoothly.)
+- better front-end
+    - icons?
+    - avoid changing input values when user interacting
+    - better theme?
+    - better layout?
+- more testing

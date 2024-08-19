@@ -2,6 +2,8 @@
 !.gitignore
 !README.md
 !requirements.txt
+!Dockerfile
 !*.py
 !*.html
 !*.tpl
+!*.json

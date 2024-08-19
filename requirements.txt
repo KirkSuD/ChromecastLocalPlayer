@@ -1,2 +1,4 @@
-bottle
-pychromecast
+bottle>=0.12.25,<0.13.0
+pychromecast>=14.0.1,<15.0.0
+requests>=2.32.3,<3.0.0
+waitress>=3.0.0,<4.0.0
