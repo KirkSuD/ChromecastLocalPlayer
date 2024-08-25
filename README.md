@@ -3,6 +3,13 @@
 A simple Python server with web UI to control Chromecast,
     play local media files via Chromecast.
 
+## Archived
+
+Archived because I basically don't use Chromecast anymore.
+
+If you somehow find this useful, you can fork the repo.  
+Or use the code as long as it's non-commercial.
+
 ## Requirements
 
 `pip install -r requirements.txt`:
