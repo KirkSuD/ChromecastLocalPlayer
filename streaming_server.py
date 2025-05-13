@@ -8,7 +8,7 @@ import bottle
 
 app = bottle.Bottle()
 config = {
-    "under_path": None,  # all path can be accessed
+    "limit_dir": None,  # all path can be accessed
     "home_path": str(Path.home()),  # home page redirect to
     "static_size": 16 * 1024 * 1024,  # <= 16MiB: return static file
     "partial_size": 4 * 1024 * 1024,  # else: default partial length 4MiB
@@ -80,19 +80,16 @@ def canonical_path(path):
 def head_file():
     path = canonical_path(bottle.request.query.path)
     print("HEAD /file", path)
-    if config["under_path"] and not path.is_relative_to(config["under_path"]):
+    if config["limit_dir"] and not path.is_relative_to(config["limit_dir"]):
         return bottle.abort(403, "Forbidden")
     if not path.is_file():
         return bottle.abort(404, "Not Found")
     size = path.stat().st_size
     bottle.response.headers["Accept-Ranges"] = "bytes"
 
-    content_type, content_encoding = mimetypes.guess_type(path)
+    content_type, _ = mimetypes.guess_type(path)
     if content_type:
         bottle.response.headers["Content-Type"] = content_type
-    if content_encoding:
-        bottle.response.headers["Content-Encoding"] = content_encoding
-
     bottle.response.headers["Content-Length"] = size
 
 
@@ -100,7 +97,7 @@ def head_file():
 def get_file():
     path = canonical_path(bottle.request.query.path)
     print("GET /file", path)
-    if config["under_path"] and not path.is_relative_to(config["under_path"]):
+    if config["limit_dir"] and not path.is_relative_to(config["limit_dir"]):
         return bottle.abort(403, "Forbidden")
     if not path.is_file():
         return bottle.abort(404, "Not Found")
@@ -110,11 +107,9 @@ def get_file():
     if "Range" not in bottle.request.headers and size <= config["static_size"]:
         return bottle.static_file(path.name, path.parent)
 
-    content_type, content_encoding = mimetypes.guess_type(path)
+    content_type, _ = mimetypes.guess_type(path)
     if content_type:
         bottle.response.headers["Content-Type"] = content_type
-    if content_encoding:
-        bottle.response.headers["Content-Encoding"] = content_encoding
 
     if "Range" in bottle.request.headers:
         start, end = parse_range(bottle.request.headers["Range"], size)
@@ -177,7 +172,7 @@ def get_explorer():
     if "path" not in query:
         return bottle.redirect(navigate_url({"path": config["home_path"]}, "/explorer"))
     path = canonical_path(query["path"])
-    if config["under_path"] and not path.is_relative_to(config["under_path"]):
+    if config["limit_dir"] and not path.is_relative_to(config["limit_dir"]):
         return bottle.abort(403, "Forbidden")
     if not path.is_dir():
         return bottle.abort(404, "Not Found")
@@ -237,28 +232,28 @@ def get_explorer():
 
 
 def add_arguments(parser):
-    parser.add_argument("--under", help="limit access under path (default: no limit)")
+    parser.add_argument("--dir", help="limit access in dir (default: no limit)")
     parser.add_argument("--home", help="home path (default: user's home dir)")
     parser.add_argument("--static", help="max static file size (default: 16MiB)")
     parser.add_argument("--partial", help="default range length (default: 4MiB)")
 
 
 def get_config(args, print_config=True):
-    config["under_path"] = args.under or config["under_path"]
+    config["limit_dir"] = args.dir or config["limit_dir"]
     config["home_path"] = args.home or config["home_path"]
     config["static_size"] = args.static or config["static_size"]
     config["partial_size"] = args.partial or config["partial_size"]
-    if config["under_path"]:
-        config["under_path"] = str(canonical_path(config["under_path"]))
+    if config["limit_dir"]:
+        config["limit_dir"] = str(canonical_path(config["limit_dir"]))
     if config["home_path"]:
         config["home_path"] = str(canonical_path(config["home_path"]))
     if config["static_size"]:
         config["static_size"] = parse_size(config["static_size"])
     if config["partial_size"]:
         config["partial_size"] = parse_size(config["partial_size"])
-    if config["under_path"]:
-        if not Path(config["home_path"]).is_relative_to(config["under_path"]):
-            config["home_path"] = config["under_path"]
+    if config["limit_dir"]:
+        if not Path(config["home_path"]).is_relative_to(config["limit_dir"]):
+            config["home_path"] = config["limit_dir"]
     if print_config:
         print("Streaming server config:", config)
         print()

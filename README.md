@@ -12,9 +12,11 @@ Or use the code as long as it's non-commercial.
 
 ## Requirements
 
+- Python 3.12+
+
 `pip install -r requirements.txt`:
 - `bottle`: fast and simple micro-framework for python
-- `pychromecast`: version 14.0.1 needs **Python 3.11+**
+- `pychromecast`: tested on version 14.0.1
 - `requests`: used to get media content-type from url
 - `waitress`: default server, optional, you can use another server
 
@@ -24,7 +26,7 @@ Or use the code as long as it's non-commercial.
 ```
 usage: chromecast_control.py [-h]
     [--server SERVER] [--host HOST] [--port PORT] [--open]
-    [--under UNDER] [--home HOME] [--static STATIC] [--partial PARTIAL] [--disable]
+    [--dir DIR] [--home HOME] [--static STATIC] [--partial PARTIAL] [--disable]
 
 An HTTP server to control Chromecast & cast local media
 
@@ -34,7 +36,7 @@ options:
   --host HOST        address to bind to (default: 0.0.0.0)
   --port PORT        port to bind to (default: 8080)
   --open             open browser (default: no)
-  --under UNDER      limit access under path (default: no limit)
+  --dir DIR          limit access in dir (default: no limit)
   --home HOME        home path (default: user's home dir)
   --static STATIC    max static file size (default: 16MiB)
   --partial PARTIAL  default range length (default: 4MiB)
